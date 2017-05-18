@@ -1,7 +1,10 @@
 package com.crush.compiler;
 
+import com.crush.annotation.BindView;
 import com.google.auto.service.AutoService;
 
+import java.lang.annotation.Annotation;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -29,7 +32,17 @@ public class CusProcessor extends AbstractProcessor {
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-        return super.getSupportedAnnotationTypes();
+        Set<String> types = new LinkedHashSet<>();
+        for (Class<? extends Annotation> a : getSupportedAnnotations()) {
+            types.add(a.getCanonicalName());
+        }
+        return types;
+    }
+
+    public Set<Class<? extends Annotation>> getSupportedAnnotations() {
+        Set<Class<? extends Annotation>> types = new LinkedHashSet<>();
+        types.add(BindView.class);
+        return types;
     }
 
     @Override

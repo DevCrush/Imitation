@@ -1,10 +1,23 @@
+import com.android.build.gradle.internal.LoggerWrapper
+import com.android.build.gradle.internal.SdkHandler
+
 apply plugin: 'java'
+
+def logger = new LoggerWrapper(project.logger)
+def sdkHandler = new SdkHandler(project, logger)
+for (File file : sdkHandler.sdkLoader.repositories) {
+    repositories.maven {
+        url = file.toURI()
+    }
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compileOnly files(org.gradle.internal.jvm.Jvm.current().getToolsJar())
     compile librarys.autoservice
     compile librarys.autocommon
+    compile librarys.javapoet
+    compile librarys.javaparser
     compile project(":annotation")
 }
 
