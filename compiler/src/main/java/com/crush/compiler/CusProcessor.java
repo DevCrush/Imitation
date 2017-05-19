@@ -1,14 +1,20 @@
 package com.crush.compiler;
 
+
 import com.crush.annotation.BindView;
 import com.google.auto.common.SuperficialValidation;
 import com.google.auto.service.AutoService;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.TypeSpec;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
@@ -16,10 +22,11 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeKind;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.type.TypeVariable;
+import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 
 import static javax.lang.model.element.ElementKind.CLASS;
@@ -58,38 +65,70 @@ public class CusProcessor extends AbstractProcessor {
     }
 
     Messager messager;
+    Elements elementUtils;
+    Filer filer;
+
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
         messager = processingEnvironment.getMessager();
+        elementUtils = processingEnv.getElementUtils();
+        filer = processingEnvironment.getFiler();
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment env) {
-
+//        for (TypeElement te : set) {
+//            if (!SuperficialValidation.validateElement(te)) continue;
+//            logv(te.toString());
+//            generateBindView(te.getEnclosingElement());
+//        }
         for (Element element : env.getElementsAnnotatedWith(BindView.class)) {
             if (!SuperficialValidation.validateElement(element)) continue;
             logv(element.toString());
-            generateBindView(  element.getEnclosingElement());
+            generateBindView(element);
         }
         return true;
     }
 
-    private void generateBindView(Element element) {
-//        TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
-        String name = element.getSimpleName().toString();
-        boolean hasError = isInaccessibleViaGeneratedCode(BindView.class, "fields", element)
-                || isBindingInWrongPackage(BindView.class, element);
+    private static final ClassName UI_THREAD =
+            ClassName.get("android.support.annotation", "UiThread");
 
-        // Verify that the target type extends from View.
-        TypeMirror elementType = element.asType();
-        if (elementType.getKind() == TypeKind.TYPEVAR) {
-            TypeVariable typeVariable = (TypeVariable) elementType;
-            elementType = typeVariable.getUpperBound();
+    private void generateBindView(Element element) {
+        //ElementType.FIELD注解可以直接强转VariableElement
+        VariableElement variableElement = (VariableElement) element;
+        TypeElement classElement = (TypeElement) element.getEnclosingElement();
+        PackageElement packageElement = elementUtils.getPackageOf(classElement);
+        //类名
+        String className = classElement.getSimpleName().toString();
+        //包名
+        String packageName = packageElement.getQualifiedName().toString();
+        //类成员名
+        String variableName = variableElement.getSimpleName().toString();
+        //类成员类型
+        TypeMirror typeMirror = variableElement.asType();
+        String type = typeMirror.toString();
+
+//        MethodSpec methodSpec = MethodSpec.methodBuilder("bindView") //方法名
+//                .addModifiers(Modifier.PUBLIC)//Modifier 修饰的关键字
+//                .addAnnotation(UI_THREAD)
+//                .addParameter(TypeName.get(classElement.asType()), "activity") //添加string[]类型的名为args的参数
+//                .addStatement("view = $findViewById($S)", "Hello World")
+//                //添加代码，这里$T和$S后面会讲，这里其实就是添加了System,out.println("Hello World");
+//                .build();
+        TypeSpec typeSpec = TypeSpec.classBuilder(className + "$$ViewBinding")
+//                .addModifiers(PUBLIC, FINAL).addMethod(methodSpec)
+                .build();
+        JavaFile javaFile = JavaFile.builder(packageName, typeSpec).build();
+        try {
+            javaFile.writeTo(filer);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-//        TypeSpec.Builder typeSpec = TypeSpec.classBuilder();//HelloWorld是类名
+
     }
+
 
     private boolean isInaccessibleViaGeneratedCode(Class<? extends Annotation> annotationClass,
                                                    String targetThing, Element element) {
