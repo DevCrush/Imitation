@@ -6,6 +6,7 @@ import com.google.auto.common.SuperficialValidation;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
@@ -30,7 +31,9 @@ import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 
 import static javax.lang.model.element.ElementKind.CLASS;
+import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PRIVATE;
+import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;
 
 /**
@@ -92,8 +95,9 @@ public class CusProcessor extends AbstractProcessor {
         return true;
     }
 
-    private static final ClassName UI_THREAD =
-            ClassName.get("android.support.annotation", "UiThread");
+    private static final ClassName UI_THREAD = ClassName.get("android.support.annotation", "UiThread");
+    //    private static final ClassName ACTIVITY = ClassName.get("android.app", "Activity");
+    private static final ClassName VIEW = ClassName.get("android.view", "View");
 
     private void generateBindView(Element element) {
         //ElementType.FIELD注解可以直接强转VariableElement
@@ -110,15 +114,29 @@ public class CusProcessor extends AbstractProcessor {
         TypeMirror typeMirror = variableElement.asType();
         String type = typeMirror.toString();
 
-//        MethodSpec methodSpec = MethodSpec.methodBuilder("bindView") //方法名
-//                .addModifiers(Modifier.PUBLIC)//Modifier 修饰的关键字
-//                .addAnnotation(UI_THREAD)
-//                .addParameter(TypeName.get(classElement.asType()), "activity") //添加string[]类型的名为args的参数
-//                .addStatement("view = $findViewById($S)", "Hello World")
-//                //添加代码，这里$T和$S后面会讲，这里其实就是添加了System,out.println("Hello World");
-//                .build();
+        final ClassName ACTIVITY = ClassName.get(packageName, className);
+
+
+        MethodSpec methodSpec = MethodSpec.methodBuilder("bindView") //方法名
+                .addModifiers(PUBLIC)//Modifier 修饰的关键字
+                .addAnnotation(UI_THREAD)
+//                .addParameter(TypeName.get(classElement.asType()), "activity")
+                .addStatement("activity." + variableName + " = (" + type + ")activity.findViewById($L)", variableElement.getAnnotation(BindView.class).value())
+                .build();
+        MethodSpec constructor = MethodSpec.constructorBuilder()
+                .addModifiers(PUBLIC)
+                .addParameter(ACTIVITY, "activity")
+                .addParameter(VIEW, "view")
+                .addStatement("this.$N = $N", "activity", "activity")
+                .addStatement("this.$N = $N", "view", "view")
+                .addStatement("bindView()")
+                .build();
         TypeSpec typeSpec = TypeSpec.classBuilder(className + "$$ViewBinding")
-//                .addModifiers(PUBLIC, FINAL).addMethod(methodSpec)
+                .addModifiers(PUBLIC, FINAL)
+                .addField(ACTIVITY, "activity")
+                .addField(VIEW, "view")
+                .addMethod(constructor)
+                .addMethod(methodSpec)
                 .build();
         JavaFile javaFile = JavaFile.builder(packageName, typeSpec).build();
         try {
