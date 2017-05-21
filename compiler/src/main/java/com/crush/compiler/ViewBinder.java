@@ -5,6 +5,7 @@ import com.squareup.javapoet.ClassName;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 
 public class ViewBinder {
@@ -15,15 +16,22 @@ public class ViewBinder {
     PackageElement packageElement;
     Element element;
     Elements elementUtils;
+    String variableName;
+    TypeMirror typeMirror;
+    String type;
+
 
     public ViewBinder(Element element, Elements elementUtils) {
         this.element = element;
         this.elementUtils = elementUtils;
-        classElement = (TypeElement) element.getEnclosingElement();
-        packageElement = elementUtils.getPackageOf(classElement);
-        className = classElement.getSimpleName().toString();
-        packageName = packageElement.getQualifiedName().toString();
-        CLASS_NAME = ClassName.get(packageName, className);
+        this.classElement = (TypeElement) element.getEnclosingElement();
+        this.packageElement = elementUtils.getPackageOf(classElement);
+        this.className = classElement.getSimpleName().toString();
+        this.packageName = packageElement.getQualifiedName().toString();
+        this.CLASS_NAME = ClassName.get(packageName, className);
+        this.variableName = element.getSimpleName().toString();
+        this.typeMirror = element.asType();
+        this.type = typeMirror.toString();
     }
 
     public String getClassName() {

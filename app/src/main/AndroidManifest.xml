@@ -16,7 +16,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SecondActivity" />
+        <activity android:name=".knife.AnnotationKnifeActivity" />
+        <activity android:name=".knife.SecondActivity" />
     </application>
 
 </manifest>
