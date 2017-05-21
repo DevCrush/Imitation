@@ -121,7 +121,7 @@ public class CusProcessor extends AbstractProcessor {
                 .addModifiers(PUBLIC)//Modifier 修饰的关键字
                 .addAnnotation(UI_THREAD)
 //                .addParameter(TypeName.get(classElement.asType()), "activity")
-                .addStatement("activity." + variableName + " = (" + type + ")activity.findViewById($L)", variableElement.getAnnotation(BindView.class).value())
+                .addStatement("activity.$N = ($L)activity.findViewById($L)", variableName, type, variableElement.getAnnotation(BindView.class).value())
                 .build();
         MethodSpec constructor = MethodSpec.constructorBuilder()
                 .addModifiers(PUBLIC)
