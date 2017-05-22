@@ -8,8 +8,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.crush.annotation.BindView;
+import com.crush.annotation.OnClick;
 import com.crush.annotationknife.AnnotationKnife;
 import com.crush.example.R;
 
@@ -32,11 +34,23 @@ public class AnnotationKnifeActivity extends AppCompatActivity {
         mTv.setText("11111111111111111111");
         mImg.setImageResource(R.mipmap.ic_launcher);
         mImg.setBackgroundColor(Color.RED);
-        mImg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(AnnotationKnifeActivity.this, SecondActivity.class));
-            }
-        });
+//        mImg.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                startActivity(new Intent(AnnotationKnifeActivity.this, SecondActivity.class));
+//            }
+//        });
+    }
+
+    @OnClick(R.id.img)
+    void click() {
+        Toast.makeText(this, "无参数", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(AnnotationKnifeActivity.this, SecondActivity.class));
+    }
+
+    @OnClick(R.id.tv)
+    void click(View v) {
+        Toast.makeText(this, v.getClass().getCanonicalName(), Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(AnnotationKnifeActivity.this, SecondActivity.class));
     }
 }

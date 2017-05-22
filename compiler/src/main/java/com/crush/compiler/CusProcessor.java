@@ -2,6 +2,7 @@ package com.crush.compiler;
 
 
 import com.crush.annotation.BindView;
+import com.crush.annotation.OnClick;
 import com.google.auto.common.SuperficialValidation;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
@@ -11,10 +12,8 @@ import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -85,28 +84,64 @@ public class CusProcessor extends AbstractProcessor {
 //            generateBindView(te.getEnclosingElement());
 //        }
 
-        Map<String, List<ViewBinder>> map = new HashMap<>();
+        Map<String, ClassBinder> mapField = new HashMap<>();
 
         for (Element element : env.getElementsAnnotatedWith(BindView.class)) {
             if (!SuperficialValidation.validateElement(element)) continue;
             logv(element.toString());
-            ViewBinder binder = new ViewBinder(element, elementUtils);
-            if (null == map.get(binder.getFullName())) {
-                List<ViewBinder> tmp = new ArrayList<>();
-                tmp.add(binder);
-                map.put(binder.getFullName(), tmp);
+            FieldInfo binder = new FieldInfo(element, elementUtils);
+            if (null == mapField.get(binder.getFullName())) {
+                ClassBinder cb = new ClassBinder();
+                cb.getFieldInfos().add(binder);
+                mapField.put(binder.getFullName(), cb);
             } else {
-                map.get(binder.getFullName()).add(binder);
+                mapField.get(binder.getFullName()).getFieldInfos().add(binder);
+            }
+        }
+        for (Element element : env.getElementsAnnotatedWith(OnClick.class)) {
+            if (!SuperficialValidation.validateElement(element)) continue;
+            logv(element.toString());
+            MethodInfo binder = new MethodInfo(element, elementUtils);
+            if (null == mapField.get(binder.getFullName())) {
+                ClassBinder cb = new ClassBinder();
+                cb.getMethodInfos().add(binder);
+                mapField.put(binder.getFullName(), cb);
+            } else {
+                mapField.get(binder.getFullName()).getMethodInfos().add(binder);
             }
         }
 
+
         MethodSpec.Builder bt = null;
-        for (String key : map.keySet()) {
-            for (int i = 0; i < map.get(key).size(); i++) {
-                bt = generateBindView(bt, map.get(key).get(i));
+        for (String key : mapField.keySet()) {
+            ClassBinder classBinder = mapField.get(key);//获取类中需要绑定的所有对象
+
+            String className = null, packageName = null;
+            ClassName CLASS_NAME = null;
+
+            int fieldSize = classBinder.getFieldInfos().size();
+            for (int i = 0; i < fieldSize; i++) {
+                FieldInfo b = classBinder.getFieldInfos().get(i);
+                if (null == className) {
+                    className = b.getClassName();
+                    packageName = b.getPackageName();
+                    CLASS_NAME = b.getCLASS_NAME();
+                }
+                bt = generateBindView(bt, b);
             }
-            ViewBinder b0 = map.get(key).get(0);
-            writeCLass(b0.className, b0.packageName, b0.CLASS_NAME, bt);
+
+            int methodSize = classBinder.getMethodInfos().size();
+            for (int i = 0; i < methodSize; i++) {
+                MethodInfo b = classBinder.getMethodInfos().get(i);
+                if (null == className) {
+                    className = b.getClassName();
+                    packageName = b.getPackageName();
+                    CLASS_NAME = b.getCLASS_NAME();
+                }
+                bt = generateOnClickMethod(bt, b);
+            }
+
+            writeCLass(className, packageName, CLASS_NAME, bt);
             bt = null;
         }
 
@@ -116,21 +151,9 @@ public class CusProcessor extends AbstractProcessor {
 
     private static final ClassName UI_THREAD = ClassName.get("android.support.annotation", "UiThread");
     private static final ClassName VIEW = ClassName.get("android.view", "View");
+    private static final ClassName ON_CLICK = ClassName.get("android.view.View", "OnClickListener");
 
-    private MethodSpec.Builder generateBindView(MethodSpec.Builder builder, ViewBinder viewBinder) {
-//        //ElementType.FIELD注解可以直接强转VariableElement
-//        VariableElement variableElement = (VariableElement) element;
-//        TypeElement classElement = (TypeElement) element.getEnclosingElement();
-//        PackageElement packageElement = elementUtils.getPackageOf(classElement);
-//        //类名
-//        String className = classElement.getSimpleName().toString();
-//        //包名
-//        String packageName = packageElement.getQualifiedName().toString();
-//        //类成员名
-//        String variableName = variableElement.getSimpleName().toString();
-//        //类成员类型
-//        TypeMirror typeMirror = variableElement.asType();
-//        String type = typeMirror.toString();
+    private MethodSpec.Builder generateBindView(MethodSpec.Builder builder, FieldInfo viewBinder) {
         if (null == builder) {
             builder = MethodSpec.methodBuilder("bindView") //方法名
                     .addModifiers(PUBLIC)//Modifier 修饰的关键字
@@ -138,8 +161,29 @@ public class CusProcessor extends AbstractProcessor {
         }
 
         return builder.addStatement("activity.$N = ($L)activity.findViewById($L)", viewBinder.variableName, viewBinder.type, viewBinder.element.getAnnotation(BindView.class).value());
+    }
 
 
+    private MethodSpec.Builder generateOnClickMethod(MethodSpec.Builder builder, MethodInfo viewBinder) {
+        if (null == builder) {
+            builder = MethodSpec.methodBuilder("bindView") //方法名
+                    .addModifiers(PUBLIC)//Modifier 修饰的关键字
+                    .addAnnotation(UI_THREAD);
+        }
+        String method = viewBinder.methodName + "(";
+        for (String name : viewBinder.getParameter().keySet()) {
+            if (viewBinder.getParameter().get(name).equals("android.view.View")) {
+                method += "v";
+            }
+        }
+        method += ")";
+        builder.addStatement("activity.findViewById($L).setOnClickListener(new $T(){" +
+                "@Override\n" +
+                "public void onClick(View v) {" +
+                "activity.$L;" +
+                "}" +
+                "});", viewBinder.element.getAnnotation(OnClick.class).value(), ON_CLICK, method);
+        return builder;
     }
 
     private void writeCLass(String className, String packageName, ClassName CLASS_NAME, MethodSpec.Builder methodSpec) {

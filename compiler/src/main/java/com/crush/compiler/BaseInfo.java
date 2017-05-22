@@ -5,49 +5,47 @@ import com.squareup.javapoet.ClassName;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 
-public class ViewBinder {
-    String className;
-    String packageName;
-    ClassName CLASS_NAME;
-    TypeElement classElement;
-    PackageElement packageElement;
-    Element element;
+public class BaseInfo {
     Elements elementUtils;
-    String variableName;
-    TypeMirror typeMirror;
-    String type;
+
+    Element element;
 
 
-    public ViewBinder(Element element, Elements elementUtils) {
+    ClassName CLASS_NAME;
+    String className;
+
+    PackageElement packageElement;
+    String packageName;
+
+    TypeElement classElement;
+
+
+    public BaseInfo(Element element, Elements elementUtils) {
         this.element = element;
         this.elementUtils = elementUtils;
         this.classElement = (TypeElement) element.getEnclosingElement();
-        this.packageElement = elementUtils.getPackageOf(classElement);
         this.className = classElement.getSimpleName().toString();
+        this.packageElement = elementUtils.getPackageOf(classElement);
         this.packageName = packageElement.getQualifiedName().toString();
         this.CLASS_NAME = ClassName.get(packageName, className);
-        this.variableName = element.getSimpleName().toString();
-        this.typeMirror = element.asType();
-        this.type = typeMirror.toString();
     }
 
-    public String getClassName() {
-        return className;
+    public Elements getElementUtils() {
+        return elementUtils;
     }
 
-    public void setClassName(String className) {
-        this.className = className;
+    public void setElementUtils(Elements elementUtils) {
+        this.elementUtils = elementUtils;
     }
 
-    public String getPackageName() {
-        return packageName;
+    public Element getElement() {
+        return element;
     }
 
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
+    public void setElement(Element element) {
+        this.element = element;
     }
 
     public ClassName getCLASS_NAME() {
@@ -58,12 +56,12 @@ public class ViewBinder {
         this.CLASS_NAME = CLASS_NAME;
     }
 
-    public TypeElement getClassElement() {
-        return classElement;
+    public String getClassName() {
+        return className;
     }
 
-    public void setClassElement(TypeElement classElement) {
-        this.classElement = classElement;
+    public void setClassName(String className) {
+        this.className = className;
     }
 
     public PackageElement getPackageElement() {
@@ -74,12 +72,20 @@ public class ViewBinder {
         this.packageElement = packageElement;
     }
 
-    public Element getElement() {
-        return element;
+    public String getPackageName() {
+        return packageName;
     }
 
-    public void setElement(Element element) {
-        this.element = element;
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
+    }
+
+    public Element getClassElement() {
+        return classElement;
+    }
+
+    public void setClassElement(TypeElement classElement) {
+        this.classElement = classElement;
     }
 
     public String getFullName() {
