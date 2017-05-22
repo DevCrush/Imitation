@@ -1,5 +1,7 @@
 package com.crush.compiler;
 
+import com.squareup.javapoet.ClassName;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,10 +10,44 @@ import java.util.List;
  */
 
 public class ClassBinder {
+    String className;
+    String packageName;
+    ClassName CLASS_NAME;
+
     List<FieldInfo> fieldInfos = new ArrayList<>();
     List<MethodInfo> methodInfos = new ArrayList<>();
 
-    public ClassBinder() {
+//    public ClassBinder() {
+//    }
+
+    public ClassBinder(String className, String packageName, ClassName CLASS_NAME) {
+        this.className = className;
+        this.packageName = packageName;
+        this.CLASS_NAME = CLASS_NAME;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
+    }
+
+    public ClassName getCLASS_NAME() {
+        return CLASS_NAME;
+    }
+
+    public void setCLASS_NAME(ClassName CLASS_NAME) {
+        this.CLASS_NAME = CLASS_NAME;
     }
 
     public ClassBinder(List<FieldInfo> fieldInfos, List<MethodInfo> methodInfos) {

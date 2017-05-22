@@ -78,70 +78,51 @@ public class CusProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment env) {
-//        for (TypeElement te : set) {
-//            if (!SuperficialValidation.validateElement(te)) continue;
-//            logv(te.toString());
-//            generateBindView(te.getEnclosingElement());
-//        }
-
-        Map<String, ClassBinder> mapField = new HashMap<>();
+        Map<String, ClassBinder> mapClassBinder = new HashMap<>();
 
         for (Element element : env.getElementsAnnotatedWith(BindView.class)) {
             if (!SuperficialValidation.validateElement(element)) continue;
             logv(element.toString());
-            FieldInfo binder = new FieldInfo(element, elementUtils);
-            if (null == mapField.get(binder.getFullName())) {
-                ClassBinder cb = new ClassBinder();
-                cb.getFieldInfos().add(binder);
-                mapField.put(binder.getFullName(), cb);
+            FieldInfo fieldInfo = new FieldInfo(element, elementUtils);
+            if (null == mapClassBinder.get(fieldInfo.getFullName())) {
+                ClassBinder cb = new ClassBinder(fieldInfo.getClassName(), fieldInfo.getPackageName(), fieldInfo.getCLASS_NAME());
+                cb.getFieldInfos().add(fieldInfo);
+                mapClassBinder.put(fieldInfo.getFullName(), cb);
             } else {
-                mapField.get(binder.getFullName()).getFieldInfos().add(binder);
+                mapClassBinder.get(fieldInfo.getFullName()).getFieldInfos().add(fieldInfo);
             }
         }
         for (Element element : env.getElementsAnnotatedWith(OnClick.class)) {
             if (!SuperficialValidation.validateElement(element)) continue;
             logv(element.toString());
-            MethodInfo binder = new MethodInfo(element, elementUtils);
-            if (null == mapField.get(binder.getFullName())) {
-                ClassBinder cb = new ClassBinder();
-                cb.getMethodInfos().add(binder);
-                mapField.put(binder.getFullName(), cb);
+            MethodInfo methodInfo = new MethodInfo(element, elementUtils);
+            if (null == mapClassBinder.get(methodInfo.getFullName())) {
+                ClassBinder cb = new ClassBinder(methodInfo.getClassName(), methodInfo.getPackageName(), methodInfo.getCLASS_NAME());
+                cb.getMethodInfos().add(methodInfo);
+                mapClassBinder.put(methodInfo.getFullName(), cb);
             } else {
-                mapField.get(binder.getFullName()).getMethodInfos().add(binder);
+                mapClassBinder.get(methodInfo.getFullName()).getMethodInfos().add(methodInfo);
             }
         }
 
 
         MethodSpec.Builder bt = null;
-        for (String key : mapField.keySet()) {
-            ClassBinder classBinder = mapField.get(key);//获取类中需要绑定的所有对象
-
-            String className = null, packageName = null;
-            ClassName CLASS_NAME = null;
-
+        for (String key : mapClassBinder.keySet()) {
+            ClassBinder classBinder = mapClassBinder.get(key);//获取类中需要绑定的所有对象
             int fieldSize = classBinder.getFieldInfos().size();
             for (int i = 0; i < fieldSize; i++) {
                 FieldInfo b = classBinder.getFieldInfos().get(i);
-                if (null == className) {
-                    className = b.getClassName();
-                    packageName = b.getPackageName();
-                    CLASS_NAME = b.getCLASS_NAME();
-                }
+
                 bt = generateBindView(bt, b);
             }
 
             int methodSize = classBinder.getMethodInfos().size();
             for (int i = 0; i < methodSize; i++) {
                 MethodInfo b = classBinder.getMethodInfos().get(i);
-                if (null == className) {
-                    className = b.getClassName();
-                    packageName = b.getPackageName();
-                    CLASS_NAME = b.getCLASS_NAME();
-                }
                 bt = generateOnClickMethod(bt, b);
             }
 
-            writeCLass(className, packageName, CLASS_NAME, bt);
+            writeCLass(classBinder.getClassName(), classBinder.getPackageName(), classBinder.getCLASS_NAME(), bt);
             bt = null;
         }
 
