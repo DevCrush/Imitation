@@ -160,7 +160,7 @@ public class CusProcessor extends AbstractProcessor {
                     .addAnnotation(UI_THREAD);
         }
 
-        return builder.addStatement("activity.$N = ($L)activity.findViewById($L)", viewBinder.variableName, viewBinder.type, viewBinder.element.getAnnotation(BindView.class).value());
+        return builder.addStatement("target.$N = ($L)sourceView.findViewById($L)", viewBinder.variableName, viewBinder.type, viewBinder.element.getAnnotation(BindView.class).value());
     }
 
 
@@ -177,10 +177,10 @@ public class CusProcessor extends AbstractProcessor {
             }
         }
         method += ")";
-        builder.addStatement("activity.findViewById($L).setOnClickListener(new $T(){" +
+        builder.addStatement("sourceView.findViewById($L).setOnClickListener(new $T(){" +
                 "@Override\n" +
                 "public void onClick(View v) {" +
-                "activity.$L;" +
+                "target.$L;" +
                 "}" +
                 "});", viewBinder.element.getAnnotation(OnClick.class).value(), ON_CLICK, method);
         return builder;
@@ -198,17 +198,17 @@ public class CusProcessor extends AbstractProcessor {
     private TypeSpec generateClass(String className, ClassName CLASS_NAME, MethodSpec bindView) {
         MethodSpec constructor = MethodSpec.constructorBuilder()
                 .addModifiers(PUBLIC)
-                .addParameter(CLASS_NAME, "activity")
-                .addParameter(VIEW, "view")
-                .addStatement("this.$N = $N", "activity", "activity")
-                .addStatement("this.$N = $N", "view", "view")
+                .addParameter(CLASS_NAME, "target")
+                .addParameter(VIEW, "sourceView")
+                .addStatement("this.$N = $N", "target", "target")
+                .addStatement("this.$N = $N", "sourceView", "sourceView")
                 .addStatement("bindView()")
                 .build();
 
         TypeSpec typeSpec = TypeSpec.classBuilder(className + "$$ViewBinding")
                 .addModifiers(PUBLIC, FINAL)
-                .addField(CLASS_NAME, "activity")
-                .addField(VIEW, "view")
+                .addField(CLASS_NAME, "target")
+                .addField(VIEW, "sourceView")
                 .addMethod(constructor)
                 .addMethod(bindView)
                 .build();

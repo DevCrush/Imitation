@@ -22,6 +22,12 @@ public class AnnotationKnife {
         createBinding(target, sourceView);
     }
 
+    @NonNull
+    @UiThread
+    public static void bind(@NonNull View sourceView, Object target) {
+        createBinding(target, sourceView);
+    }
+
     private static void createBinding(@NonNull Object target, @NonNull View source) {
         Class<?> targetClass = target.getClass();
         Constructor constructor = findBindingConstructorForClass(targetClass);
@@ -53,7 +59,7 @@ public class AnnotationKnife {
         try {
             Class<?> bindingClass = cls.getClassLoader().loadClass(clsName + "$$ViewBinding");
             //noinspection unchecked
-              bindingCtor = bindingClass.getConstructor(cls, View.class);
+            bindingCtor = bindingClass.getConstructor(cls, View.class);
         } catch (ClassNotFoundException e) {
             bindingCtor = findBindingConstructorForClass(cls.getSuperclass());
         } catch (NoSuchMethodException e) {
