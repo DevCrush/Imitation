@@ -23,6 +23,7 @@ import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -37,16 +38,8 @@ import static javax.lang.model.element.Modifier.PUBLIC;
  * ./gradlew --no-daemon -Dorg.gradle.debug=true :app:clean :app:compileDebugJavaWithJavac
  */
 @AutoService(Processor.class)
+@SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class CusProcessor extends AbstractProcessor {
-    @Override
-    public Set<String> getSupportedOptions() {
-        return super.getSupportedOptions();
-    }
-
-    @Override
-    public SourceVersion getSupportedSourceVersion() {
-        return SourceVersion.RELEASE_7;
-    }
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
