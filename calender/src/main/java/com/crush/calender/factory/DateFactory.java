@@ -1,6 +1,6 @@
-package com.crush.calender.release;
+package com.crush.calender.factory;
 
-import com.crush.calender.ItemDay;
+import com.crush.calender.model.ItemDay;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -11,18 +11,23 @@ import java.util.List;
  */
 
 public class DateFactory {
-    public static List<ItemDay> generateDaysInMonth(int year, int month) {
+    public static List<ItemDay> generateDaysInMonth(int year, int month, boolean firstDayOfWeekIsSun) {
         Calendar mCalendar = Calendar.getInstance();
         List<ItemDay> content = new ArrayList<>();
-        content.add(new ItemDay("日"));
+        if (firstDayOfWeekIsSun) {
+            content.add(new ItemDay("日"));
+        }
         content.add(new ItemDay("一"));
         content.add(new ItemDay("二"));
         content.add(new ItemDay("三"));
         content.add(new ItemDay("四"));
         content.add(new ItemDay("五"));
         content.add(new ItemDay("六"));
+        if (!firstDayOfWeekIsSun) {
+            content.add(new ItemDay("日"));
+        }
         mCalendar.set(Calendar.YEAR, year);
-        mCalendar.setFirstDayOfWeek(Calendar.SUNDAY);
+        mCalendar.setFirstDayOfWeek(firstDayOfWeekIsSun ? Calendar.SUNDAY : Calendar.MONDAY);
         mCalendar.set(Calendar.DAY_OF_MONTH, 1);
         mCalendar.set(Calendar.MONTH, month);
         int dayOfWeek = mCalendar.get(Calendar.DAY_OF_WEEK);

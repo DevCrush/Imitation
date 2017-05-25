@@ -1,4 +1,4 @@
-package com.crush.calender.release;
+package com.crush.calender;
 
 import java.util.Date;
 

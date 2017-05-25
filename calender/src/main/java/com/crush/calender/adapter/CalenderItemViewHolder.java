@@ -1,4 +1,4 @@
-package com.crush.calender;
+package com.crush.calender.adapter;
 
 import android.graphics.Color;
 import android.text.TextUtils;
@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.crush.calender.R;
+import com.crush.calender.model.ItemDay;
 
 import java.util.Calendar;
 

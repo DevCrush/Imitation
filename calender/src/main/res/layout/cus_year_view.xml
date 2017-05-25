@@ -3,17 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.crush.calender.MonthView
+    <com.crush.calender.view.MonthView
         android:id="@+id/cv0"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.crush.calender.MonthView
+    <com.crush.calender.view.MonthView
         android:id="@+id/cv1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.crush.calender.MonthView
+    <com.crush.calender.view.MonthView
         android:id="@+id/cv2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

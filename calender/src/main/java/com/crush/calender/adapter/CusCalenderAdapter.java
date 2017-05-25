@@ -1,9 +1,11 @@
-package com.crush.calender;
+package com.crush.calender.adapter;
 
 import android.util.Log;
 import android.view.View;
 
 import com.chad.library.adapter.base.BaseMultiItemQuickAdapter;
+import com.crush.calender.R;
+import com.crush.calender.model.ItemDay;
 
 import java.util.List;
 

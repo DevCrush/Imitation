@@ -1,4 +1,4 @@
-package com.crush.calender;
+package com.crush.calender.view;
 
 import android.content.Context;
 import android.support.annotation.AttrRes;
@@ -12,7 +12,8 @@ import android.view.VelocityTracker;
 import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 
-import com.crush.calender.release.OnMonthChangeListener;
+import com.crush.calender.R;
+import com.crush.calender.OnMonthChangeListener;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
@@ -47,13 +48,23 @@ public class YearView extends FrameLayout {
 
     Calendar currentCalender = Calendar.getInstance();
 
+
+    public boolean isFirstDayOfWeekIsSun() {
+        return cv0.isFirstDayOfWeekIsSun();
+    }
+
+    public void setFirstDayOfWeekIsSun(boolean firstDayOfWeekIsSun) {
+        cv0.setFirstDayOfWeekIsSun(firstDayOfWeekIsSun);
+        cv1.setFirstDayOfWeekIsSun(firstDayOfWeekIsSun);
+        cv2.setFirstDayOfWeekIsSun(firstDayOfWeekIsSun);
+    }
+
     public void initView() {
         this.context = getContext();
         LayoutInflater.from(getContext()).inflate(R.layout.cus_year_view, this, true);
         cv0 = (MonthView) findViewById(R.id.cv0);
         cv1 = (MonthView) findViewById(R.id.cv1);
         cv2 = (MonthView) findViewById(R.id.cv2);
-        currentCalender.setFirstDayOfWeek(Calendar.SUNDAY);
         freshData();
     }
 
@@ -133,7 +144,7 @@ public class YearView extends FrameLayout {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 mVelocityTracker.computeCurrentVelocity(1, 8f);
-                //                Log.e("mVelocityTracker", "x: " + mVelocityTracker.getXVelocity() + ", y: " + mVelocityTracker.getYVelocity());
+//                Log.e("mVelocityTracker", "x: " + mVelocityTracker.getXVelocity() + ", y: " + mVelocityTracker.getYVelocity());
                 int direction = 0;
                 if (Math.abs(distance) > autoScrollOffset) {
                     direction = distance > 0 ? -1 : 1;
@@ -144,10 +155,7 @@ public class YearView extends FrameLayout {
                         current += direction;
                     }
                 }
-                if (current > 2)
-                    current = 0;
-                else if (current < 0)
-                    current = 2;
+                fixPosition();
                 changePosition(direction);
 
                 releaseVelocityTracker();
@@ -156,6 +164,13 @@ public class YearView extends FrameLayout {
                 break;
         }
         return true;
+    }
+
+    private void fixPosition() {
+        if (current > 2)
+            current = 0;
+        else if (current < 0)
+            current = 2;
     }
 
     private void releaseVelocityTracker() {
@@ -182,20 +197,21 @@ public class YearView extends FrameLayout {
     int autoScrollOffset;
 
     public void lastMonth() {
+        forceStopAnim();
         --current;
-        if (current < 0)
-            current = 2;
+        fixPosition();
         changePosition(-1);
     }
 
     public void nextMonth() {
+        forceStopAnim();
         ++current;
-        if (current > 2)
-            current = 0;
+        fixPosition();
         changePosition(1);
     }
 
     public void setDate(Date date) {
+        forceStopAnim();
         this.currentMonth = date;
         Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -218,6 +234,14 @@ public class YearView extends FrameLayout {
         }
     }
 
+    private void forceStopAnim() {
+        if (null != set && set.isStarted()) {
+            set.end();
+        }
+    }
+
+    AnimatorSet set;
+
     private void changePosition(final int direction) {
         if (direction > 0)
             autoScrollLeft = -(int) (width - Math.abs(distance));
@@ -226,7 +250,7 @@ public class YearView extends FrameLayout {
         else
             autoScrollLeft = -(int) distance;
         ObjectAnimator animator0, animator1, animator2;
-        AnimatorSet set = new AnimatorSet();
+        set = new AnimatorSet();
         animator0 = ObjectAnimator.ofFloat(cv0, "translationX", cv0.getTranslationX(), cv0.getTranslationX() + autoScrollLeft);
         animator1 = ObjectAnimator.ofFloat(cv1, "translationX", cv1.getTranslationX(), cv1.getTranslationX() + autoScrollLeft);
         animator2 = ObjectAnimator.ofFloat(cv2, "translationX", cv2.getTranslationX(), cv2.getTranslationX() + autoScrollLeft);
@@ -244,6 +268,7 @@ public class YearView extends FrameLayout {
                 moving = false;
                 autoMoving = false;
                 distance = 0;
+                set = null;
             }
 
             @Override
@@ -263,19 +288,19 @@ public class YearView extends FrameLayout {
 
     Date currentMonth;
 
-    private void reInitContent(int diriction) {
+    private void reInitContent(int direction) {
         if (current == 0) {
             m0 = 0;
             m1 = width;
             m2 = -width;
             currentMonth = (Date) cv0.getTag();
-            if (diriction > 0) {
+            if (direction > 0) {
                 Calendar c = Calendar.getInstance();
                 c.setTime(currentMonth);
                 c.add(Calendar.MONTH, 1);
                 cv1.freshContentData(c.get(Calendar.YEAR), c.get(Calendar.MONTH));
                 cv1.setTag(c.getTime());
-            } else if (diriction < 0) {
+            } else if (direction < 0) {
                 Calendar c = Calendar.getInstance();
                 c.setTime(currentMonth);
                 c.add(Calendar.MONTH, -1);
@@ -287,13 +312,13 @@ public class YearView extends FrameLayout {
             m1 = 0;
             m2 = width;
             currentMonth = (Date) cv1.getTag();
-            if (diriction > 0) {
+            if (direction > 0) {
                 Calendar c = Calendar.getInstance();
                 c.setTime(currentMonth);
                 c.add(Calendar.MONTH, 1);
                 cv2.freshContentData(c.get(Calendar.YEAR), c.get(Calendar.MONTH));
                 cv2.setTag(c.getTime());
-            } else if (diriction < 0) {
+            } else if (direction < 0) {
                 Calendar c = Calendar.getInstance();
                 c.setTime(currentMonth);
                 c.add(Calendar.MONTH, -1);
@@ -305,13 +330,13 @@ public class YearView extends FrameLayout {
             m1 = -width;
             m2 = 0;
             currentMonth = (Date) cv2.getTag();
-            if (diriction > 0) {
+            if (direction > 0) {
                 Calendar c = Calendar.getInstance();
                 c.setTime(currentMonth);
                 c.add(Calendar.MONTH, 1);
                 cv0.freshContentData(c.get(Calendar.YEAR), c.get(Calendar.MONTH));
                 cv0.setTag(c.getTime());
-            } else if (diriction < 0) {
+            } else if (direction < 0) {
                 Calendar c = Calendar.getInstance();
                 c.setTime(currentMonth);
                 c.add(Calendar.MONTH, -1);

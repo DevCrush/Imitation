@@ -9,7 +9,7 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.crush.calender.release.OnMonthChangeListener;
+import com.crush.calender.view.YearView;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
@@ -52,6 +52,9 @@ public class CusCalenderView extends RelativeLayout {
             public void currentMonth(Date date) {
                 now.setTime(date);
                 freshContent();
+                if (null != onMonthChangeListener) {
+                    onMonthChangeListener.currentMonth(date);
+                }
             }
         });
         now.set(Calendar.DAY_OF_MONTH, 1);
@@ -85,18 +88,15 @@ public class CusCalenderView extends RelativeLayout {
                 yearView.nextMonth();
             }
         });
-//        vp.setAdapter();
-
     }
 
-    public void freshMonth() {
-//        monthView.freshContentData(year, month);
-//
-//        if (now.get(Calendar.MONTH) == Calendar.getInstance().get(Calendar.MONTH)) {
-//            monthView.chooseDate(Calendar.getInstance().getTimeInMillis());
-//        } else {
-//            monthView.chooseDate(now.getTimeInMillis());
-//        }
+    OnMonthChangeListener onMonthChangeListener;
+
+    public OnMonthChangeListener getOnMonthChangeListener() {
+        return onMonthChangeListener;
     }
 
+    public void setOnMonthChangeListener(OnMonthChangeListener onMonthChangeListener) {
+        this.onMonthChangeListener = onMonthChangeListener;
+    }
 }

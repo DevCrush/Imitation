@@ -1,4 +1,4 @@
-package com.crush.calender;
+package com.crush.calender.model;
 
 import android.text.TextUtils;
 

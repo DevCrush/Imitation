@@ -1,4 +1,4 @@
-package com.crush.calender;
+package com.crush.calender.view;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
@@ -7,7 +7,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 
-import com.crush.calender.release.DateFactory;
+import com.crush.calender.adapter.CusCalenderAdapter;
+import com.crush.calender.model.ItemDay;
+import com.crush.calender.factory.DateFactory;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -46,14 +48,22 @@ public class MonthView extends RecyclerView {
         setAdapter(mAdapter);
     }
 
-
     Calendar mCalendar = Calendar.getInstance();
     int year, month;
+    boolean firstDayOfWeekIsSun = true;
+
+    public boolean isFirstDayOfWeekIsSun() {
+        return firstDayOfWeekIsSun;
+    }
+
+    public void setFirstDayOfWeekIsSun(boolean firstDayOfWeekIsSun) {
+        this.firstDayOfWeekIsSun = firstDayOfWeekIsSun;
+    }
 
     public void freshContentData(int year, int month) {
         this.year = year;
         this.month = month;
-        mAdapter.setNewData(DateFactory.generateDaysInMonth(year, month));
+        mAdapter.setNewData(DateFactory.generateDaysInMonth(year, month, firstDayOfWeekIsSun));
     }
 
     int lastChoosePosition;
