@@ -83,7 +83,7 @@ public class YearView extends FrameLayout {
             cv0.getLayoutParams().width = width;
             cv1.getLayoutParams().width = width;
             cv2.getLayoutParams().width = width;
-            reInitContent(current, 0);
+            reInitContent(0);
         }
     }
 
@@ -181,6 +181,43 @@ public class YearView extends FrameLayout {
     int autoScrollLeft;
     int autoScrollOffset;
 
+    public void lastMonth() {
+        --current;
+        if (current < 0)
+            current = 2;
+        changePosition(-1);
+    }
+
+    public void nextMonth() {
+        ++current;
+        if (current > 2)
+            current = 0;
+        changePosition(1);
+    }
+
+    public void setDate(Date date) {
+        this.currentMonth = date;
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.set(Calendar.DAY_OF_MONTH, 1);
+        c.add(Calendar.MONTH, -1);
+        cv0.setTranslationX(-width);
+        cv1.setTranslationX(0);
+        cv2.setTranslationX(width);
+        current = 1;
+        cv0.freshContentData(c.get(Calendar.YEAR), c.get(Calendar.MONTH));
+        cv0.setTag(c.getTime());
+        c.add(Calendar.MONTH, 1);
+        cv1.freshContentData(c.get(Calendar.YEAR), c.get(Calendar.MONTH));
+        cv1.setTag(c.getTime());
+        c.add(Calendar.MONTH, 1);
+        cv2.freshContentData(c.get(Calendar.YEAR), c.get(Calendar.MONTH));
+        cv2.setTag(c.getTime());
+        if (null != monthChangeListener) {
+            monthChangeListener.currentMonth(currentMonth);
+        }
+    }
+
     private void changePosition(final int direction) {
         if (direction > 0)
             autoScrollLeft = -(int) (width - Math.abs(distance));
@@ -203,9 +240,10 @@ public class YearView extends FrameLayout {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                reInitContent(current, direction);
+                reInitContent(direction);
                 moving = false;
                 autoMoving = false;
+                distance = 0;
             }
 
             @Override
@@ -225,8 +263,8 @@ public class YearView extends FrameLayout {
 
     Date currentMonth;
 
-    private void reInitContent(int currentPage, int diriction) {
-        if (currentPage == 0) {
+    private void reInitContent(int diriction) {
+        if (current == 0) {
             m0 = 0;
             m1 = width;
             m2 = -width;
@@ -244,7 +282,7 @@ public class YearView extends FrameLayout {
                 cv2.freshContentData(c.get(Calendar.YEAR), c.get(Calendar.MONTH));
                 cv2.setTag(c.getTime());
             }
-        } else if (currentPage == 1) {
+        } else if (current == 1) {
             m0 = -width;
             m1 = 0;
             m2 = width;
@@ -262,7 +300,7 @@ public class YearView extends FrameLayout {
                 cv0.freshContentData(c.get(Calendar.YEAR), c.get(Calendar.MONTH));
                 cv0.setTag(c.getTime());
             }
-        } else if (currentPage == 2) {
+        } else if (current == 2) {
             m0 = width;
             m1 = -width;
             m2 = 0;
