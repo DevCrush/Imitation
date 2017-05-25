@@ -8,8 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 
 import com.crush.calender.adapter.CusCalenderAdapter;
-import com.crush.calender.model.ItemDay;
 import com.crush.calender.factory.DateFactory;
+import com.crush.calender.model.ItemDay;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -23,7 +23,6 @@ public class MonthView extends RecyclerView {
     GridLayoutManager mGridLayoutManager;
     List<ItemDay> content = new ArrayList<>();
     CusCalenderAdapter mAdapter;
-
 
     public MonthView(Context context) {
         super(context);

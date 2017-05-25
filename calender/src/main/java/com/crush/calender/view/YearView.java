@@ -9,11 +9,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
-import android.view.animation.LinearInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
-import com.crush.calender.R;
 import com.crush.calender.OnMonthChangeListener;
+import com.crush.calender.R;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
@@ -27,6 +28,8 @@ import java.util.Date;
 
 public class YearView extends FrameLayout {
     MonthView cv0, cv1, cv2;
+    TextView tvTitle0, tvTitle1, tvTitle2, tvTitle3, tvTitle4, tvTitle5, tvTitle6;
+
     Context context;
     int current = 1;
     private VelocityTracker mVelocityTracker;//生命变量
@@ -46,6 +49,26 @@ public class YearView extends FrameLayout {
         initView();
     }
 
+    private void initWeekTitle(boolean firstDayOfWeekIsSun) {
+        if (firstDayOfWeekIsSun) {
+            tvTitle0.setText("日");
+            tvTitle1.setText("一");
+            tvTitle2.setText("二");
+            tvTitle3.setText("三");
+            tvTitle4.setText("四");
+            tvTitle5.setText("五");
+            tvTitle6.setText("六");
+        } else {
+            tvTitle0.setText("一");
+            tvTitle1.setText("二");
+            tvTitle2.setText("三");
+            tvTitle3.setText("四");
+            tvTitle4.setText("五");
+            tvTitle5.setText("六");
+            tvTitle6.setText("日");
+        }
+    }
+
     Calendar currentCalender = Calendar.getInstance();
 
 
@@ -57,16 +80,26 @@ public class YearView extends FrameLayout {
         cv0.setFirstDayOfWeekIsSun(firstDayOfWeekIsSun);
         cv1.setFirstDayOfWeekIsSun(firstDayOfWeekIsSun);
         cv2.setFirstDayOfWeekIsSun(firstDayOfWeekIsSun);
+        initWeekTitle(firstDayOfWeekIsSun);
     }
 
     public void initView() {
         this.context = getContext();
         LayoutInflater.from(getContext()).inflate(R.layout.cus_year_view, this, true);
+        tvTitle0 = (TextView) findViewById(R.id.tv_title_0);
+        tvTitle1 = (TextView) findViewById(R.id.tv_title_1);
+        tvTitle2 = (TextView) findViewById(R.id.tv_title_2);
+        tvTitle3 = (TextView) findViewById(R.id.tv_title_3);
+        tvTitle4 = (TextView) findViewById(R.id.tv_title_4);
+        tvTitle5 = (TextView) findViewById(R.id.tv_title_5);
+        tvTitle6 = (TextView) findViewById(R.id.tv_title_6);
         cv0 = (MonthView) findViewById(R.id.cv0);
         cv1 = (MonthView) findViewById(R.id.cv1);
         cv2 = (MonthView) findViewById(R.id.cv2);
+        initWeekTitle(true);
         freshData();
     }
+
 
     private void freshData() {
         currentCalender.add(Calendar.MONTH, -1);
@@ -249,13 +282,11 @@ public class YearView extends FrameLayout {
             autoScrollLeft = (int) (width - Math.abs(distance));
         else
             autoScrollLeft = -(int) distance;
-        ObjectAnimator animator0, animator1, animator2;
+
         set = new AnimatorSet();
-        animator0 = ObjectAnimator.ofFloat(cv0, "translationX", cv0.getTranslationX(), cv0.getTranslationX() + autoScrollLeft);
-        animator1 = ObjectAnimator.ofFloat(cv1, "translationX", cv1.getTranslationX(), cv1.getTranslationX() + autoScrollLeft);
-        animator2 = ObjectAnimator.ofFloat(cv2, "translationX", cv2.getTranslationX(), cv2.getTranslationX() + autoScrollLeft);
+
         set.setDuration(Math.abs(autoScrollLeft / autoScrollOffset) * 200);
-        set.setInterpolator(new LinearInterpolator());
+        set.setInterpolator(new DecelerateInterpolator());
         set.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -281,7 +312,11 @@ public class YearView extends FrameLayout {
 
             }
         });
-        set.playTogether(animator0, animator1, animator2);
+        set.playTogether(
+                ObjectAnimator.ofFloat(cv0, "translationX", cv0.getTranslationX(), cv0.getTranslationX() + autoScrollLeft),
+                ObjectAnimator.ofFloat(cv1, "translationX", cv1.getTranslationX(), cv1.getTranslationX() + autoScrollLeft),
+                ObjectAnimator.ofFloat(cv2, "translationX", cv2.getTranslationX(), cv2.getTranslationX() + autoScrollLeft)
+        );
         set.start();
         autoMoving = true;
     }

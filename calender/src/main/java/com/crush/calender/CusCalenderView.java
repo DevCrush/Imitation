@@ -61,6 +61,10 @@ public class CusCalenderView extends RelativeLayout {
         freshContent();
     }
 
+    public void setDate(Date date) {
+        yearView.setDate(date);
+    }
+
     DecimalFormat format = new DecimalFormat("00");
 
     private void freshContent() {
