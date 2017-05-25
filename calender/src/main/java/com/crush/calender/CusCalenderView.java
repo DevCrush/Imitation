@@ -82,8 +82,7 @@ public class CusCalenderView extends RelativeLayout {
         btnNextMonth.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                now.add(Calendar.MONTH, 1);
-                yearView.setDate(now.getTime());
+                yearView.nextMonth();
             }
         });
 //        vp.setAdapter();
