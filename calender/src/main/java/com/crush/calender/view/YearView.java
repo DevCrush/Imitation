@@ -184,7 +184,7 @@ public class YearView extends FrameLayout {
                     current += direction;
                 } else {
                     if (Math.abs(mVelocityTracker.getXVelocity()) > 1.5) {
-                        direction = distance > 0 ? -1 : 1;
+                        direction = mVelocityTracker.getXVelocity() > 0 ? -1 : 1;
                         current += direction;
                     }
                 }
@@ -276,6 +276,7 @@ public class YearView extends FrameLayout {
     AnimatorSet set;
 
     private void changePosition(final int direction) {
+        forceStopAnim();
         if (direction > 0)
             autoScrollLeft = -(int) (width - Math.abs(distance));
         else if (direction < 0)
