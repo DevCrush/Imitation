@@ -20,6 +20,7 @@
         <activity android:name=".knife.SecondActivity" />
         <activity android:name=".calender.CalenderTestActivity" />
         <activity android:name=".calender.YearViewTestActivity" />
+        <activity android:name=".bus.BusTestActivity" />
     </application>
 
 </manifest>
