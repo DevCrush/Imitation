@@ -47,7 +47,7 @@ public class CalenderItemViewHolder extends BaseViewHolder {
             } else {
                 tvLunar.setVisibility(View.GONE);
             }
-            if (data.isChoose()) {
+            if (data.isChoose() && data.getCurrent() == 0) {
                 itemView.setBackgroundColor(Color.GREEN);
                 changeTextColor(Color.WHITE);
             } else if (DateUtils.isToday(c.getTimeInMillis())) {

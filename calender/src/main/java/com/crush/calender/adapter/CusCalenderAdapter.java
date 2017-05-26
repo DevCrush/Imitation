@@ -2,8 +2,8 @@ package com.crush.calender.adapter;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.crush.calender.model.ItemDay;
+import com.crush.calender.utils.DateUtils;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +38,7 @@ public class CusCalenderAdapter extends BaseQuickAdapter<ItemDay, CalenderItemVi
         List<ItemDay> data = getData();
         for (int i = 0; i < size; i++) {
             ItemDay item = data.get(i);
-            boolean needCheck = isSameDay(item.getC().getTime(), checkedDate);
+            boolean needCheck = DateUtils.isSameDay(item.getC().getTime(), checkedDate);
             if (needCheck != item.isChoose()) {
                 item.setChoose(needCheck);
                 notifyItemChanged(i);
@@ -46,13 +46,5 @@ public class CusCalenderAdapter extends BaseQuickAdapter<ItemDay, CalenderItemVi
         }
     }
 
-    private boolean isSameDay(Date d1, Date d2) {
-        if (null == d1 || null == d2)
-            return false;
-        Calendar c1 = Calendar.getInstance();
-        c1.setTime(d1);
-        Calendar c2 = Calendar.getInstance();
-        c2.setTime(d2);
-        return (c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR)) && (c1.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR));
-    }
+
 }

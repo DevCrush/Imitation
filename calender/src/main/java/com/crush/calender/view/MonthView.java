@@ -19,7 +19,6 @@ import com.crush.calender.factory.DateFactory;
 import com.crush.calender.model.ItemDay;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +30,7 @@ public class MonthView extends RecyclerView {
     GridLayoutManager mGridLayoutManager;
     List<ItemDay> content = new ArrayList<>();
     CusCalenderAdapter mAdapter;
+    YearView yearView;
 
     public MonthView(Context context) {
         super(context);
@@ -69,15 +69,23 @@ public class MonthView extends RecyclerView {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 super.onItemClick(adapter, view, position);
-                if (null != onDateCheckedListener) {
-                    onDateCheckedListener.onDateChange(mAdapter.getData().get(position).getC().getTime());
+                ItemDay itemDay = mAdapter.getData().get(position);
+                if (null != yearView) {
+                    if (itemDay.getCurrent() > 0) {
+                        yearView.nextMonth();
+                    } else if (itemDay.getCurrent() < 0) {
+                        yearView.lastMonth();
+                    }
                 }
+                if (null != onDateCheckedListener) {
+                    onDateCheckedListener.onDateChange(itemDay.getC().getTime());
+                }
+
             }
         });
         setAdapter(mAdapter);
     }
 
-    Calendar mCalendar = Calendar.getInstance();
     int year, month;
     boolean firstDayOfWeekIsSun = true;
 
@@ -101,7 +109,7 @@ public class MonthView extends RecyclerView {
             return;
         mAdapter.setShowLunar(true);
         if (animation) {
-            mAdapter.notifyItemRangeChanged(0, 41);
+            mAdapter.notifyItemRangeChanged(0, mAdapter.getItemCount() - 1);
         } else {
             mAdapter.notifyDataSetChanged();
         }
@@ -112,7 +120,7 @@ public class MonthView extends RecyclerView {
             return;
         mAdapter.setShowLunar(false);
         if (animation) {
-            mAdapter.notifyItemRangeChanged(0, 41);
+            mAdapter.notifyItemRangeChanged(0, mAdapter.getItemCount() - 1);
         } else {
             mAdapter.notifyDataSetChanged();
         }
@@ -130,5 +138,21 @@ public class MonthView extends RecyclerView {
 
     public void setOnDateCheckedListener(OnDateCheckedListener onDateCheckedListener) {
         this.onDateCheckedListener = onDateCheckedListener;
+    }
+
+    public YearView getYearView() {
+        return yearView;
+    }
+
+    public void setYearView(YearView yearView) {
+        this.yearView = yearView;
+    }
+
+    public int getMonth() {
+        return month;
+    }
+
+    public int getYear() {
+        return year;
     }
 }

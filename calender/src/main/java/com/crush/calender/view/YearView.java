@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.crush.calender.OnCalendarStateChangeListener;
 import com.crush.calender.R;
+import com.crush.calender.utils.DateUtils;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
@@ -31,6 +32,7 @@ public class YearView extends FrameLayout {
     Date checkedDate;
     Context context;
     int current = 1;
+    boolean autoSelect;
     private VelocityTracker mVelocityTracker;//用于计算手势速度
 
     Calendar currentCalender = Calendar.getInstance();
@@ -70,6 +72,9 @@ public class YearView extends FrameLayout {
         cv0.setOnDateCheckedListener(onDateCheckedListener);
         cv1.setOnDateCheckedListener(onDateCheckedListener);
         cv2.setOnDateCheckedListener(onDateCheckedListener);
+        cv0.setYearView(this);
+        cv1.setYearView(this);
+        cv2.setYearView(this);
         initWeekTitle(true);
         freshData();
     }
@@ -78,9 +83,7 @@ public class YearView extends FrameLayout {
         @Override
         public void onDateChange(Date date) {
             checkedDate = date;
-            cv0.chooseDate(date);
-            cv1.chooseDate(date);
-            cv2.chooseDate(date);
+            chooseDate(date);
             if (null != cusCalenderListener) {
                 cusCalenderListener.onDateSelect(date);
             }
@@ -396,17 +399,25 @@ public class YearView extends FrameLayout {
         cv0.setTranslationX(m0);
         cv1.setTranslationX(m1);
         cv2.setTranslationX(m2);
-        cv0.chooseDate(checkedDate);
-        cv1.chooseDate(checkedDate);
-        cv2.chooseDate(checkedDate);
+        chooseDate(checkedDate);
         if (null != monthChangeListener && 0 != direction) {
             monthChangeListener.currentMonth(currentMonth);
         }
         if (null != cusCalenderListener && 0 != direction) {
             Calendar c = Calendar.getInstance();
             c.setTime(currentMonth);
+            if (autoSelect) {
+                autoSelect(c.get(Calendar.YEAR), c.get(Calendar.MONTH));
+            }
             cusCalenderListener.onMonthChange(c.get(Calendar.YEAR), c.get(Calendar.MONTH));
         }
+    }
+
+    public void chooseDate(Date checkedDate) {
+        this.checkedDate = checkedDate;
+        cv0.chooseDate(checkedDate);
+        cv1.chooseDate(checkedDate);
+        cv2.chooseDate(checkedDate);
     }
 
     OnMonthChangeListener monthChangeListener;
@@ -439,6 +450,40 @@ public class YearView extends FrameLayout {
 
     public void setCusCalenderListener(OnCalendarStateChangeListener cusCalenderListener) {
         this.cusCalenderListener = cusCalenderListener;
+    }
+
+    public void setAutoSelectEnable(boolean autoSelect) {
+        this.autoSelect = autoSelect;
+        int year = 0, month = 0;
+        if (current == 0) {
+            year = cv0.getYear();
+            month = cv0.getMonth();
+        } else if (current == 1) {
+            year = cv1.getYear();
+            month = cv1.getMonth();
+        } else if (current == 2) {
+            year = cv2.getYear();
+            month = cv2.getMonth();
+        }
+        if (autoSelect)
+            autoSelect(year, month);
+        else {
+            cv0.chooseDate(null);
+            cv1.chooseDate(null);
+            cv2.chooseDate(null);
+        }
+    }
+
+    private void autoSelect(int year, int month) {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.DAY_OF_MONTH, 1);
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.MONTH, month);
+        if (!DateUtils.isSameMonth(new Date(), c.getTime())) {
+            chooseDate(c.getTime());
+        } else {
+            chooseDate(new Date());
+        }
     }
 
 }

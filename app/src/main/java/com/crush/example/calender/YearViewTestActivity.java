@@ -28,10 +28,12 @@ public class YearViewTestActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_year_view_test);
         AnnotationKnife.bind(this);
+        yearView.setAutoSelectEnable(false);
         yearView.setCusCalenderListener(new OnCalendarStateChangeListener() {
             @Override
             public void onMonthChange(int year, int month) {
                 Log.v("onMonthChange", year + "/" + month);
+
             }
 
             @Override
