@@ -26,12 +26,18 @@ import java.util.Date;
  */
 
 public class YearView extends FrameLayout {
-    MonthView cv0, cv1, cv2;
-    TextView tvTitle0, tvTitle1, tvTitle2, tvTitle3, tvTitle4, tvTitle5, tvTitle6;
+    MonthView cv0, cv1, cv2;//三个月视图交替
+    TextView tvTitle0, tvTitle1, tvTitle2, tvTitle3, tvTitle4, tvTitle5, tvTitle6;//周一到周日文字
     Date checkedDate;
     Context context;
     int current = 1;
-    private VelocityTracker mVelocityTracker;//生命变量
+    private VelocityTracker mVelocityTracker;//用于计算手势速度
+
+    Calendar currentCalender = Calendar.getInstance();
+
+    int width, height;//控件宽高
+
+    boolean moving = false;//标记移动中
 
     public YearView(@NonNull Context context) {
         super(context);
@@ -46,40 +52,6 @@ public class YearView extends FrameLayout {
     public YearView(@NonNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initView();
-    }
-
-    private void initWeekTitle(boolean firstDayOfWeekIsSun) {
-        if (firstDayOfWeekIsSun) {
-            tvTitle0.setText("日");
-            tvTitle1.setText("一");
-            tvTitle2.setText("二");
-            tvTitle3.setText("三");
-            tvTitle4.setText("四");
-            tvTitle5.setText("五");
-            tvTitle6.setText("六");
-        } else {
-            tvTitle0.setText("一");
-            tvTitle1.setText("二");
-            tvTitle2.setText("三");
-            tvTitle3.setText("四");
-            tvTitle4.setText("五");
-            tvTitle5.setText("六");
-            tvTitle6.setText("日");
-        }
-    }
-
-    Calendar currentCalender = Calendar.getInstance();
-
-
-    public boolean isFirstDayOfWeekIsSun() {
-        return cv0.isFirstDayOfWeekIsSun();
-    }
-
-    public void setFirstDayOfWeekIsSun(boolean firstDayOfWeekIsSun) {
-        cv0.setFirstDayOfWeekIsSun(firstDayOfWeekIsSun);
-        cv1.setFirstDayOfWeekIsSun(firstDayOfWeekIsSun);
-        cv2.setFirstDayOfWeekIsSun(firstDayOfWeekIsSun);
-        initWeekTitle(firstDayOfWeekIsSun);
     }
 
     public void initView() {
@@ -115,6 +87,38 @@ public class YearView extends FrameLayout {
         }
     };
 
+
+    private void initWeekTitle(boolean firstDayOfWeekIsSun) {
+        if (firstDayOfWeekIsSun) {
+            tvTitle0.setText("日");
+            tvTitle1.setText("一");
+            tvTitle2.setText("二");
+            tvTitle3.setText("三");
+            tvTitle4.setText("四");
+            tvTitle5.setText("五");
+            tvTitle6.setText("六");
+        } else {
+            tvTitle0.setText("一");
+            tvTitle1.setText("二");
+            tvTitle2.setText("三");
+            tvTitle3.setText("四");
+            tvTitle4.setText("五");
+            tvTitle5.setText("六");
+            tvTitle6.setText("日");
+        }
+    }
+
+    public boolean isFirstDayOfWeekIsSun() {
+        return cv0.isFirstDayOfWeekIsSun();
+    }
+
+    public void setFirstDayOfWeekIsSun(boolean firstDayOfWeekIsSun) {
+        cv0.setFirstDayOfWeekIsSun(firstDayOfWeekIsSun);
+        cv1.setFirstDayOfWeekIsSun(firstDayOfWeekIsSun);
+        cv2.setFirstDayOfWeekIsSun(firstDayOfWeekIsSun);
+        initWeekTitle(firstDayOfWeekIsSun);
+    }
+
     private void freshData() {
         currentCalender.add(Calendar.MONTH, -1);
         cv0.freshContentData(currentCalender.get(Calendar.YEAR), currentCalender.get(Calendar.MONTH));
@@ -126,8 +130,6 @@ public class YearView extends FrameLayout {
         cv2.freshContentData(currentCalender.get(Calendar.YEAR), currentCalender.get(Calendar.MONTH));
         cv2.setTag(currentCalender.getTime());
     }
-
-    int width, height;
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
@@ -144,8 +146,6 @@ public class YearView extends FrameLayout {
             reInitContent(0);
         }
     }
-
-    boolean moving = false;
 
 
     @Override
@@ -239,9 +239,9 @@ public class YearView extends FrameLayout {
     }
 
 
-    int m0, m1, m2;
-    int autoScrollLeft;
-    int autoScrollOffset;
+    int m0, m1, m2;//三个view最终位置
+    int autoScrollLeft;//需要自动滚动的距离
+    int autoScrollOffset;//慢速拖动时需要自动滚动的临界值
 
     public void lastMonth() {
         forceStopAnim();
@@ -257,12 +257,13 @@ public class YearView extends FrameLayout {
         changePosition(1);
     }
 
-    public void setDate(Date date) {
+    public void setDate(int year, int curMonth) {
         forceStopAnim();
-        this.currentMonth = date;
         Calendar c = Calendar.getInstance();
-        c.setTime(date);
         c.set(Calendar.DAY_OF_MONTH, 1);
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.MONTH, curMonth);
+        this.currentMonth = c.getTime();
         c.add(Calendar.MONTH, -1);
         cv0.setTranslationX(-width);
         cv1.setTranslationX(0);
