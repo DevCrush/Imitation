@@ -42,7 +42,7 @@ public class Bus {
         return new Bus();
     }
 
-    public void regist(Object subscriber) {
+    public void register(Object subscriber) {
         Class clazz = subscriber.getClass();
         Method[] method = clazz.getDeclaredMethods();
         boolean hasMethod = false;
@@ -63,9 +63,23 @@ public class Bus {
             }
         }
         if (!hasMethod) {
-            throw new RuntimeException("regist error, Must have method with annotation " + Subscribe.class.getCanonicalName() + " in subscriber:");
+            throw new RuntimeException("register error, Must have method with annotation " + Subscribe.class.getCanonicalName() + " in subscriber:");
         }
 
+    }
+
+    public void unregister(Object subscriber) {
+        for (String s : subscribers.keySet()) {
+            List<Bean> beans = subscribers.get(s);
+            for (Bean b : beans) {
+                if (b.getO().equals(subscriber)) {
+                    beans.remove(b);
+                }
+            }
+            if (beans.isEmpty()) {
+                subscribers.remove(s);
+            }
+        }
     }
 
     public void postEvent(Object event) {

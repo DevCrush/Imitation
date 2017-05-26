@@ -29,7 +29,7 @@ public class BusTestActivity extends AppCompatActivity {
         setContentView(R.layout.activity_bus_test);
         AnnotationKnife.bind(this);
         bus = Bus.createNewBus();
-        bus.regist(this);
+        bus.register(this);
     }
 
     @OnClick(R.id.btn)
