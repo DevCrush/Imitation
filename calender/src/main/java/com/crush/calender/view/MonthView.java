@@ -1,5 +1,7 @@
 package com.crush.calender.view;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -9,6 +11,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.animation.BaseAnimation;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.crush.calender.R;
 import com.crush.calender.adapter.CusCalenderAdapter;
@@ -49,7 +52,14 @@ public class MonthView extends RecyclerView {
         mGridLayoutManager.setAutoMeasureEnabled(true);
         setLayoutManager(mGridLayoutManager);
         mAdapter = new CusCalenderAdapter(R.layout.item_cus_calender_day, content);
-        mAdapter.openLoadAnimation(BaseQuickAdapter.SCALEIN);
+        mAdapter.openLoadAnimation(new BaseAnimation() {
+            @Override
+            public Animator[] getAnimators(View view) {
+                return new Animator[]{
+                        ObjectAnimator.ofFloat(view, "scaleY", 1f)
+                };
+            }
+        });
         addOnItemTouchListener(new OnItemClickListener() {
             @Override
             public void onSimpleItemClick(BaseQuickAdapter adapter, View view, int position) {
@@ -84,24 +94,6 @@ public class MonthView extends RecyclerView {
         this.month = month;
         mAdapter.setNewData(new ArrayList<ItemDay>());
         mAdapter.addData(DateFactory.generateDaysInMonth(year, month, firstDayOfWeekIsSun));
-    }
-
-    int lastChoosePosition;
-
-    public void chooseDate(long date) {
-        mAdapter.getItem(lastChoosePosition).setChoose(false);
-        mAdapter.notifyItemChanged(lastChoosePosition);
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(date);
-        c.set(Calendar.DAY_OF_MONTH, 1);
-        c.setFirstDayOfWeek(Calendar.SUNDAY);
-        int offset = mCalendar.get(Calendar.DAY_OF_WEEK) - 1;
-        c.setTimeInMillis(date);
-        int position = offset + 7 + c.get(Calendar.DAY_OF_MONTH);
-        ItemDay day = mAdapter.getItem(position);
-        day.setChoose(true);
-        mAdapter.notifyItemChanged(position);
-        lastChoosePosition = position;
     }
 
     public void showLunar(boolean animation) {
