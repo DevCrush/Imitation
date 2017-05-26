@@ -103,4 +103,12 @@ public class CusCalenderView extends RelativeLayout {
     public void setOnMonthChangeListener(OnMonthChangeListener onMonthChangeListener) {
         this.onMonthChangeListener = onMonthChangeListener;
     }
+
+    public void showLunar() {
+        yearView.showLunar();
+    }
+
+    public void goneLunar() {
+        yearView.goneLunar();
+    }
 }

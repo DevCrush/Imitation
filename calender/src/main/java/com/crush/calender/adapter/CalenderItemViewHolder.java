@@ -8,8 +8,8 @@ import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.crush.calender.R;
+import com.crush.calender.lunar.LunarCalendar;
 import com.crush.calender.model.ItemDay;
-import com.xhinliang.lunarcalendar.LunarCalendar;
 
 import java.util.Calendar;
 
@@ -25,18 +25,28 @@ public class CalenderItemViewHolder extends BaseViewHolder {
         super(view);
     }
 
-    public void initViewWithData(ItemDay data) {
+    public void initViewWithData(ItemDay data, boolean showLunar) {
         tvDay = (TextView) itemView.findViewById(R.id.tv_day);
         tvLunar = (TextView) itemView.findViewById(R.id.tv_lunar);
         if (!TextUtils.isEmpty(data.getTitle())) {
             tvDay.setText(data.getTitle());
         } else {
             Calendar c = data.getC();
-            String lunar = "";
-            if (1900 <= c.get(Calendar.YEAR) && c.get(Calendar.YEAR) <= 2100) {
-                lunar = LunarCalendar.obtainCalendar(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH)).getLunarDay();
+            if (showLunar) {
+                String lunar = "";
+                if (1900 <= c.get(Calendar.YEAR) && c.get(Calendar.YEAR) <= 2100) {
+                    LunarCalendar lunarCalendar = LunarCalendar.obtainCalendar(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH));
+//                lunar = lunarCalendar.getLunarDay()
+//                        + "\n" + lunarCalendar.getSubTitle()
+//                        + "\n" + lunarCalendar.getSolarTerm()
+//                        + "\n" + lunarCalendar.getFestivals().toString();
+                    lunar = lunarCalendar.getSubTitle();
+                }
+                tvLunar.setText(lunar);
+                tvLunar.setVisibility(View.VISIBLE);
+            } else {
+                tvLunar.setVisibility(View.GONE);
             }
-            tvLunar.setText(lunar);
             if (data.isChoose()) {
                 itemView.setBackgroundColor(Color.GREEN);
                 changeTextColor(Color.WHITE);

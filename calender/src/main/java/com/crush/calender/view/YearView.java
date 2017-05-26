@@ -396,4 +396,16 @@ public class YearView extends FrameLayout {
     public void setMonthChangeListener(OnMonthChangeListener monthChangeListener) {
         this.monthChangeListener = monthChangeListener;
     }
+
+    public void showLunar() {
+        cv0.showLunar(current == 0);
+        cv1.showLunar(current == 1);
+        cv2.showLunar(current == 2);
+    }
+
+    public void goneLunar() {
+        cv0.goneLunar(current == 0);
+        cv1.goneLunar(current == 1);
+        cv2.goneLunar(current == 2);
+    }
 }

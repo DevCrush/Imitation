@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.crush.calender.adapter.CusCalenderAdapter;
 import com.crush.calender.factory.DateFactory;
 import com.crush.calender.model.ItemDay;
@@ -44,6 +45,7 @@ public class MonthView extends RecyclerView {
         mGridLayoutManager.setAutoMeasureEnabled(true);
         setLayoutManager(mGridLayoutManager);
         mAdapter = new CusCalenderAdapter(content);
+        mAdapter.openLoadAnimation(BaseQuickAdapter.SCALEIN);
         setAdapter(mAdapter);
     }
 
@@ -62,7 +64,8 @@ public class MonthView extends RecyclerView {
     public void freshContentData(int year, int month) {
         this.year = year;
         this.month = month;
-        mAdapter.setNewData(DateFactory.generateDaysInMonth(year, month, firstDayOfWeekIsSun));
+        mAdapter.setNewData(new ArrayList<ItemDay>());
+        mAdapter.addData(DateFactory.generateDaysInMonth(year, month, firstDayOfWeekIsSun));
     }
 
     int lastChoosePosition;
@@ -70,7 +73,6 @@ public class MonthView extends RecyclerView {
     public void chooseDate(long date) {
         mAdapter.getItem(lastChoosePosition).setChoose(false);
         mAdapter.notifyItemChanged(lastChoosePosition);
-
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(date);
         c.set(Calendar.DAY_OF_MONTH, 1);
@@ -82,5 +84,27 @@ public class MonthView extends RecyclerView {
         day.setChoose(true);
         mAdapter.notifyItemChanged(position);
         lastChoosePosition = position;
+    }
+
+    public void showLunar(boolean animation) {
+        if (mAdapter.isShowLunar())
+            return;
+        mAdapter.setShowLunar(true);
+        if (animation) {
+            mAdapter.notifyItemRangeChanged(0, 41);
+        } else {
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public void goneLunar(boolean animation) {
+        if (!mAdapter.isShowLunar())
+            return;
+        mAdapter.setShowLunar(false);
+        if (animation) {
+            mAdapter.notifyItemRangeChanged(0, 41);
+        } else {
+            mAdapter.notifyDataSetChanged();
+        }
     }
 }

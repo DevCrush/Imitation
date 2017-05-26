@@ -14,6 +14,7 @@ import java.util.List;
  */
 
 public class CusCalenderAdapter extends BaseMultiItemQuickAdapter<ItemDay, CalenderItemViewHolder> {
+    private boolean showLunar = true;
 
     public CusCalenderAdapter(List<ItemDay> data) {
         super(data);
@@ -21,10 +22,17 @@ public class CusCalenderAdapter extends BaseMultiItemQuickAdapter<ItemDay, Calen
         addItemType(1, R.layout.item_cus_calender_day);
     }
 
+    public boolean isShowLunar() {
+        return showLunar;
+    }
+
+    public void setShowLunar(boolean showLunar) {
+        this.showLunar = showLunar;
+    }
 
     @Override
     protected void convert(CalenderItemViewHolder helper, ItemDay item) {
-        helper.initViewWithData(item);
+        helper.initViewWithData(item, showLunar);
         helper.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
