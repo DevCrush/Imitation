@@ -34,11 +34,22 @@ public class BusTestActivity extends AppCompatActivity {
 
     @OnClick(R.id.btn)
     void send() {
-        bus.postEvent(new Object());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                bus.postEvent(new Object());
+            }
+        }).start();
     }
 
     @Subscribe
     public void aaaaaa(Object o) {
-        tv.append("收到一个\n");
+        final long id = Thread.currentThread().getId();
+        tv.post(new Runnable() {
+            @Override
+            public void run() {
+                tv.append("收到一个,当前线程：" + id + "\n");
+            }
+        });
     }
 }
