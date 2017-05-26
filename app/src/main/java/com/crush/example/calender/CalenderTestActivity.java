@@ -30,9 +30,6 @@ public class CalenderTestActivity extends AppCompatActivity {
     @OnClick(R.id.btn_today)
     void btn_today() {
         Calendar c = Calendar.getInstance();
-        c.set(Calendar.YEAR, 2100);
-        c.set(Calendar.MONTH, 12);
-        c.set(Calendar.DAY_OF_MONTH, 1);
         cusCalenderView.setDate(c.getTime());
     }
 
