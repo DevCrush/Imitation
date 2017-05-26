@@ -6,14 +6,19 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.view.View;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.listener.OnItemClickListener;
+import com.crush.calender.OnDateCheckedListener;
+import com.crush.calender.R;
 import com.crush.calender.adapter.CusCalenderAdapter;
 import com.crush.calender.factory.DateFactory;
 import com.crush.calender.model.ItemDay;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,8 +49,22 @@ public class MonthView extends RecyclerView {
         mGridLayoutManager = new GridLayoutManager(getContext(), 7, LinearLayoutManager.VERTICAL, false);
         mGridLayoutManager.setAutoMeasureEnabled(true);
         setLayoutManager(mGridLayoutManager);
-        mAdapter = new CusCalenderAdapter(content);
+        mAdapter = new CusCalenderAdapter(R.layout.item_cus_calender_day, content);
         mAdapter.openLoadAnimation(BaseQuickAdapter.SCALEIN);
+        addOnItemTouchListener(new OnItemClickListener() {
+            @Override
+            public void onSimpleItemClick(BaseQuickAdapter adapter, View view, int position) {
+
+            }
+
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                super.onItemClick(adapter, view, position);
+                if (null != onDateCheckedListener) {
+                    onDateCheckedListener.onDateChange(mAdapter.getData().get(position).getC().getTime());
+                }
+            }
+        });
         setAdapter(mAdapter);
     }
 
@@ -106,5 +125,19 @@ public class MonthView extends RecyclerView {
         } else {
             mAdapter.notifyDataSetChanged();
         }
+    }
+
+    public void chooseDate(Date date) {
+        mAdapter.choosePosition(date);
+    }
+
+    OnDateCheckedListener onDateCheckedListener;
+
+    public OnDateCheckedListener getOnDateCheckedListener() {
+        return onDateCheckedListener;
+    }
+
+    public void setOnDateCheckedListener(OnDateCheckedListener onDateCheckedListener) {
+        this.onDateCheckedListener = onDateCheckedListener;
     }
 }

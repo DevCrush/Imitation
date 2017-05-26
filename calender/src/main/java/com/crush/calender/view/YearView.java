@@ -13,6 +13,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.crush.calender.OnDateCheckedListener;
 import com.crush.calender.OnMonthChangeListener;
 import com.crush.calender.R;
 import com.nineoldandroids.animation.Animator;
@@ -29,7 +30,7 @@ import java.util.Date;
 public class YearView extends FrameLayout {
     MonthView cv0, cv1, cv2;
     TextView tvTitle0, tvTitle1, tvTitle2, tvTitle3, tvTitle4, tvTitle5, tvTitle6;
-
+    Date checkedDate;
     Context context;
     int current = 1;
     private VelocityTracker mVelocityTracker;//生命变量
@@ -96,10 +97,22 @@ public class YearView extends FrameLayout {
         cv0 = (MonthView) findViewById(R.id.cv0);
         cv1 = (MonthView) findViewById(R.id.cv1);
         cv2 = (MonthView) findViewById(R.id.cv2);
+        cv0.setOnDateCheckedListener(onDateCheckedListener);
+        cv1.setOnDateCheckedListener(onDateCheckedListener);
+        cv2.setOnDateCheckedListener(onDateCheckedListener);
         initWeekTitle(true);
         freshData();
     }
 
+    OnDateCheckedListener onDateCheckedListener = new OnDateCheckedListener() {
+        @Override
+        public void onDateChange(Date date) {
+            checkedDate = date;
+            cv0.chooseDate(date);
+            cv1.chooseDate(date);
+            cv2.chooseDate(date);
+        }
+    };
 
     private void freshData() {
         currentCalender.add(Calendar.MONTH, -1);
@@ -283,9 +296,7 @@ public class YearView extends FrameLayout {
             autoScrollLeft = (int) (width - Math.abs(distance));
         else
             autoScrollLeft = -(int) distance;
-
         set = new AnimatorSet();
-
         set.setDuration(Math.abs(autoScrollLeft / autoScrollOffset) * 200);
         set.setInterpolator(new DecelerateInterpolator());
         set.addListener(new Animator.AnimatorListener() {
@@ -383,6 +394,9 @@ public class YearView extends FrameLayout {
         cv0.setTranslationX(m0);
         cv1.setTranslationX(m1);
         cv2.setTranslationX(m2);
+        cv0.chooseDate(checkedDate);
+        cv1.chooseDate(checkedDate);
+        cv2.chooseDate(checkedDate);
         if (null != monthChangeListener) {
             monthChangeListener.currentMonth(currentMonth);
         }
