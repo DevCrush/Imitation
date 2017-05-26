@@ -193,14 +193,14 @@ public class YearView extends FrameLayout {
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                mVelocityTracker.computeCurrentVelocity(1, 8f);
+                mVelocityTracker.computeCurrentVelocity(1, 3f);
 //                Log.e("mVelocityTracker", "x: " + mVelocityTracker.getXVelocity() + ", y: " + mVelocityTracker.getYVelocity());
                 int direction = 0;
                 if (Math.abs(distance) > autoScrollOffset) {
                     direction = distance > 0 ? -1 : 1;
                     current += direction;
                 } else {
-                    if (Math.abs(mVelocityTracker.getXVelocity()) > 1.5) {
+                    if (Math.abs(mVelocityTracker.getXVelocity()) > 2) {
                         direction = mVelocityTracker.getXVelocity() > 0 ? -1 : 1;
                         current += direction;
                     }
