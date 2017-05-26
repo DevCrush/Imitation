@@ -11,6 +11,7 @@ import android.widget.ListView;
 import com.crush.annotation.BindView;
 import com.crush.annotationknife.AnnotationKnife;
 import com.crush.example.calender.CalenderTestActivity;
+import com.crush.example.calender.YearViewTestActivity;
 import com.crush.example.knife.AnnotationKnifeActivity;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
@@ -19,7 +20,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     ArrayAdapter<String> adapter;
     static final String ANNOTATION_KNIFE = "AnnotationKnife";
     static final String CALENDER_VIEW = "CalenderView";
-    static final String[] activities = new String[]{ANNOTATION_KNIFE, CALENDER_VIEW};
+    static final String YEAR_VIEW = "YearView";
+    static final String[] activities = new String[]{ANNOTATION_KNIFE, CALENDER_VIEW, YEAR_VIEW};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         switch (adapter.getItem(i)) {
             case ANNOTATION_KNIFE:
                 intent = new Intent(this, AnnotationKnifeActivity.class);
+                break;
+            case YEAR_VIEW:
+                intent = new Intent(this, YearViewTestActivity.class);
                 break;
             case CALENDER_VIEW:
                 intent = new Intent(this, CalenderTestActivity.class);

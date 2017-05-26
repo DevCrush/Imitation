@@ -5,7 +5,6 @@ import android.support.annotation.AttrRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -13,8 +12,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.crush.calender.OnDateCheckedListener;
-import com.crush.calender.OnMonthChangeListener;
+import com.crush.calender.OnCalendarStateChangeListener;
 import com.crush.calender.R;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorSet;
@@ -111,6 +109,9 @@ public class YearView extends FrameLayout {
             cv0.chooseDate(date);
             cv1.chooseDate(date);
             cv2.chooseDate(date);
+            if (null != cusCalenderListener) {
+                cusCalenderListener.onDateSelect(date);
+            }
         }
     };
 
@@ -133,8 +134,8 @@ public class YearView extends FrameLayout {
         super.onLayout(changed, left, top, right, bottom);
         width = right - left;
         height = bottom - top;
-        Log.v("onLayout", "w -> " + width);
-        Log.v("onLayout", "h -> " + height);
+//        Log.v("onLayout", "w -> " + width);
+//        Log.v("onLayout", "h -> " + height);
         if (changed) {
             autoScrollOffset = width / 2;
             cv0.getLayoutParams().width = width;
@@ -397,8 +398,13 @@ public class YearView extends FrameLayout {
         cv0.chooseDate(checkedDate);
         cv1.chooseDate(checkedDate);
         cv2.chooseDate(checkedDate);
-        if (null != monthChangeListener) {
+        if (null != monthChangeListener && 0 != direction) {
             monthChangeListener.currentMonth(currentMonth);
+        }
+        if (null != cusCalenderListener && 0 != direction) {
+            Calendar c = Calendar.getInstance();
+            c.setTime(currentMonth);
+            cusCalenderListener.onMonthChange(c.get(Calendar.YEAR), c.get(Calendar.MONTH));
         }
     }
 
@@ -423,4 +429,15 @@ public class YearView extends FrameLayout {
         cv1.goneLunar(current == 1);
         cv2.goneLunar(current == 2);
     }
+
+    OnCalendarStateChangeListener cusCalenderListener;
+
+    public OnCalendarStateChangeListener getCusCalenderListener() {
+        return cusCalenderListener;
+    }
+
+    public void setCusCalenderListener(OnCalendarStateChangeListener cusCalenderListener) {
+        this.cusCalenderListener = cusCalenderListener;
+    }
+
 }

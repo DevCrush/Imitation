@@ -10,7 +10,6 @@ import android.view.View;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
-import com.crush.calender.OnDateCheckedListener;
 import com.crush.calender.R;
 import com.crush.calender.adapter.CusCalenderAdapter;
 import com.crush.calender.factory.DateFactory;

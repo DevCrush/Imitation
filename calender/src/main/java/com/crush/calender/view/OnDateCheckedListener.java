@@ -1,4 +1,4 @@
-package com.crush.calender;
+package com.crush.calender.view;
 
 import java.util.Date;
 
@@ -6,6 +6,6 @@ import java.util.Date;
  * Created by Crush on 5/26/17.
  */
 
-public interface OnDateCheckedListener {
+interface OnDateCheckedListener {
     void onDateChange(Date date);
 }

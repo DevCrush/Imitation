@@ -1,4 +1,4 @@
-package com.crush.calender;
+package com.crush.calender.view;
 
 import java.util.Date;
 

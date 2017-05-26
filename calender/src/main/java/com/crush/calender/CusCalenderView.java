@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.crush.calender.view.OnMonthChangeListener;
 import com.crush.calender.view.YearView;
 
 import java.text.DecimalFormat;
@@ -52,9 +53,6 @@ public class CusCalenderView extends RelativeLayout {
             public void currentMonth(Date date) {
                 now.setTime(date);
                 freshContent();
-                if (null != onMonthChangeListener) {
-                    onMonthChangeListener.currentMonth(date);
-                }
             }
         });
         now.set(Calendar.DAY_OF_MONTH, 1);
@@ -94,14 +92,15 @@ public class CusCalenderView extends RelativeLayout {
         });
     }
 
-    OnMonthChangeListener onMonthChangeListener;
+    OnCalendarStateChangeListener cusCalenderListener;
 
-    public OnMonthChangeListener getOnMonthChangeListener() {
-        return onMonthChangeListener;
+    public OnCalendarStateChangeListener getCusCalenderListener() {
+        return cusCalenderListener;
     }
 
-    public void setOnMonthChangeListener(OnMonthChangeListener onMonthChangeListener) {
-        this.onMonthChangeListener = onMonthChangeListener;
+    public void setCusCalenderListener(OnCalendarStateChangeListener cusCalenderListener) {
+        this.cusCalenderListener = cusCalenderListener;
+        yearView.setCusCalenderListener(cusCalenderListener);
     }
 
     public void showLunar() {
