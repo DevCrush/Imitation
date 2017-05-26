@@ -76,6 +76,7 @@ public class Bus {
                 b.getM().invoke(b.getO(), event);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
+                beenList.remove(b);
             }
         }
     }
