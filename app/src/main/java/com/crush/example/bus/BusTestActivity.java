@@ -40,12 +40,9 @@ public class BusTestActivity extends AppCompatActivity {
 
     @OnClick(R.id.btn)
     void send() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                bus.postEvent(new Object());
-            }
-        }).start();
+        bus.postEvent(new Object());
+        bus.postOnMainThread(new Object());
+        bus.postOnNewThread(new Object());
     }
 
     @Subscribe

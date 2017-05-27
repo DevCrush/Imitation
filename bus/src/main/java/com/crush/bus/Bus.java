@@ -1,5 +1,8 @@
 package com.crush.bus;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import com.crush.bus.annotation.Subscribe;
 
 import java.lang.reflect.InvocationTargetException;
@@ -14,29 +17,29 @@ import java.util.Map;
  */
 
 public class Bus {
-    class Bean {
-        Method m;
-        Object o;
+    private class BusBean {
+        Method method;
+        Object subscriber;
 
-        public Bean(Method m, Object o) {
-            this.m = m;
-            this.o = o;
+        public BusBean(Method method, Object subscriber) {
+            this.method = method;
+            this.subscriber = subscriber;
         }
 
-        public Object getO() {
-            return o;
+        public Object getSubscriber() {
+            return subscriber;
         }
 
-        public Method getM() {
-            return m;
+        public Method getMethod() {
+            return method;
         }
 
-        public void setM(Method m) {
-            this.m = m;
+        public void setMethod(Method method) {
+            this.method = method;
         }
     }
 
-    private Map<String, List<Bean>> subscribers = new HashMap<>();
+    private Map<String, List<BusBean>> subscribers = new HashMap<>();
 
     public static Bus createNewBus() {
         return new Bus();
@@ -53,11 +56,11 @@ public class Bus {
                     throw new RuntimeException("must have one parameter");
                 }
                 String parameterTypeName = classes[0].getCanonicalName();
-                List<Bean> registeredBeans = subscribers.get(parameterTypeName);
+                List<BusBean> registeredBeans = subscribers.get(parameterTypeName);
                 if (null == registeredBeans) {
                     registeredBeans = new ArrayList<>();
                 }
-                registeredBeans.add(new Bean(m, subscriber));
+                registeredBeans.add(new BusBean(m, subscriber));
                 subscribers.put(parameterTypeName, registeredBeans);
                 hasMethod = true;
             }
@@ -70,9 +73,9 @@ public class Bus {
 
     public void unregister(Object subscriber) {
         for (String s : subscribers.keySet()) {
-            List<Bean> beans = subscribers.get(s);
-            for (Bean b : beans) {
-                if (b.getO().equals(subscriber)) {
+            List<BusBean> beans = subscribers.get(s);
+            for (BusBean b : beans) {
+                if (b.getSubscriber().equals(subscriber)) {
                     beans.remove(b);
                 }
             }
@@ -82,14 +85,34 @@ public class Bus {
         }
     }
 
-    public void postEvent(Object event) {
+    Handler handler = new Handler(Looper.getMainLooper());
+
+    public synchronized void postOnMainThread(final Object event) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                postEvent(event);
+            }
+        });
+    }
+
+    public synchronized void postOnNewThread(final Object event) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                postEvent(event);
+            }
+        }).start();
+    }
+
+    public synchronized void postEvent(Object event) {
         String parameterTypeName = event.getClass().getCanonicalName();
-        List<Bean> beenList = subscribers.get(parameterTypeName);
+        List<BusBean> beenList = subscribers.get(parameterTypeName);
         if (null == beenList)
             return;
-        for (Bean b : beenList) {
+        for (BusBean b : beenList) {
             try {
-                b.getM().invoke(b.getO(), event);
+                b.getMethod().invoke(b.getSubscriber(), event);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
                 beenList.remove(b);
