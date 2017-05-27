@@ -85,6 +85,8 @@ public class Bus {
     public void postEvent(Object event) {
         String parameterTypeName = event.getClass().getCanonicalName();
         List<Bean> beenList = subscribers.get(parameterTypeName);
+        if (null == beenList)
+            return;
         for (Bean b : beenList) {
             try {
                 b.getM().invoke(b.getO(), event);

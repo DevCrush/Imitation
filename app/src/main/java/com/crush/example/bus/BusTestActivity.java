@@ -32,6 +32,12 @@ public class BusTestActivity extends AppCompatActivity {
         bus.register(this);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        bus.unregister(this);
+    }
+
     @OnClick(R.id.btn)
     void send() {
         new Thread(new Runnable() {
