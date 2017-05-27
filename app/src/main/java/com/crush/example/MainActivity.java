@@ -13,6 +13,7 @@ import com.crush.annotationknife.AnnotationKnife;
 import com.crush.example.bus.BusTestActivity;
 import com.crush.example.calender.CalenderTestActivity;
 import com.crush.example.calender.YearViewTestActivity;
+import com.crush.example.ffmpeg.FFmpegTestActivity;
 import com.crush.example.knife.AnnotationKnifeActivity;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
@@ -23,11 +24,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     static final String CALENDER_VIEW = "CalenderView";
     static final String YEAR_VIEW = "YearView";
     static final String BUS = "Bus";
+    static final String FFMPEG = "FFmpeg";
     static final String[] activities = new String[]{
             ANNOTATION_KNIFE,
             CALENDER_VIEW,
             YEAR_VIEW,
-            BUS
+            BUS,
+            FFMPEG
     };
 
     @Override
@@ -56,6 +59,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
             case BUS:
                 intent = new Intent(this, BusTestActivity.class);
+                break;
+            case FFMPEG:
+                intent = new Intent(this, FFmpegTestActivity.class);
                 break;
             default:
                 break;
